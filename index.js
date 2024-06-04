@@ -24,3 +24,11 @@ app.use(express.urlencoded({extended: true}))
 app.listen(port, ()=>{
     console.log('servidor de node esta escuchando en el puerto ' + port)
 }) 
+
+//conectar ruta de prueba
+
+app.get('/ruta-de-prueba',(req,res)=>{
+    res.status(200).json({
+        message: "Conexión exitosa"
+    })
+})
