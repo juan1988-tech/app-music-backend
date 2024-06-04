@@ -33,13 +33,34 @@ const register = (req,res) =>{
             message: "Validación no superada"
         })
     } 
+    //Control de usuarios duplicados
+    User.find({
+        $or:[
+            { email: params.email.toLowerCase() },
+            { nickname: params.nickname.toLowerCase() }
+        ]
+   }).exec().then((user)=>{
+
+    if(!user){
+        return res.status(500).send({
+            status:"failed",
+            message: "Error en la consulta de usuarios  duplicados"
+        })
+    }
+
+    if(user && user.length >=1){
+        return res.status(200).send({
+            status: "error",
+            message: "El usuario ya existe",
+            user
+        })
+    }
 
     return res.status(200).json({
         status:"success",
         message:"Usuario creado exitosamente",
     })
-
-   
+   })
 }
 
 module.exports = { pruebaUser,register }
