@@ -71,12 +71,19 @@ const register = (req,res) =>{
         })
     }
 
+    console.log(userSaved)
+
     //Guarda el usuario en la base de datos
     userSaved.save().then((userStored)=>{
+        //limpiar el password y el rol del objeto de retorno
+        let userCreated = userStored.toObject();
+        delete userCreated.password;
+        delete userCreated.role;
+
         return res.status(200).json({
             status:"success",
             message:"Usuario creado exitosamente",
-            user: userStored
+            user: userCreated
         })
     })
    })
