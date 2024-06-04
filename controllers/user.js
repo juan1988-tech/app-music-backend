@@ -1,5 +1,6 @@
 const User = require('../models/user')
 const validate  = require('../helpers/validate')
+const bcrypt = require('bcrypt')
 
 //acción de prueba
 const pruebaUser = (req,res) =>{
@@ -39,7 +40,7 @@ const register = (req,res) =>{
             { email: params.email.toLowerCase() },
             { nickname: params.nickname.toLowerCase() }
         ]
-   }).exec().then((user)=>{
+   }).exec().then( async (user)=>{
 
     if(!user){
         return res.status(500).send({
@@ -56,9 +57,27 @@ const register = (req,res) =>{
         })
     }
 
-    return res.status(200).json({
-        status:"success",
-        message:"Usuario creado exitosamente",
+    //cifrar la contraseña
+    let pwd = await bcrypt.hash(params.password,10);
+    params.password = pwd;
+
+    //crea el objeto de usuario
+    let userSaved = new User(params);
+
+    if(!userSaved){
+        return res.status(500).json({
+            status:"success",
+            message: "Error al registrar en la base de datos",
+        })
+    }
+
+    //Guarda el usuario en la base de datos
+    userSaved.save().then((userStored)=>{
+        return res.status(200).json({
+            status:"success",
+            message:"Usuario creado exitosamente",
+            user: userStored
+        })
     })
    })
 }
