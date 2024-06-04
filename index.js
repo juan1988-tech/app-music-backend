@@ -1,1 +1,4 @@
-console.log('soy una aplicación ssssde música');
+//importar conexión a la base de datos
+const connection = require('./database/connection');
+
+connection()
