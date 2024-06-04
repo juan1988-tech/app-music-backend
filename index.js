@@ -32,3 +32,15 @@ app.get('/ruta-de-prueba',(req,res)=>{
         message: "Conexión exitosa"
     })
 })
+
+//cargar controlador de ruta
+const userRoutes = require('./routes/user');
+const songRoutes = require('./routes/song');
+const artistsRoutes = require('./routes/artists');
+const albumRoutes = require('./routes/album');
+
+//cargar  las rutas correspondientes
+app.use("/api/usuario",userRoutes);
+app.use('/api/cancion',songRoutes);
+app.use('/api/artista',artistsRoutes);
+app.use('/api/album',albumRoutes)
