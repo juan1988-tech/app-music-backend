@@ -7,4 +7,12 @@ const pruebaUser = (req,res) =>{
     })
 }
 
-module.exports = { pruebaUser }
+//registro
+const register = (req,res) =>{
+    return res.status(200).json({
+        status:"success",
+        message:"Usuario creado exitosamente"
+    })
+}
+
+module.exports = { pruebaUser,register }
