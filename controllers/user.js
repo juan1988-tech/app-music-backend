@@ -89,4 +89,13 @@ const register = (req,res) =>{
    })
 }
 
-module.exports = { pruebaUser,register }
+const login = (req,res) =>{
+
+    return res.status(200).json({
+        status:"success",
+        message:"Usuario ingresa correctamente",
+    })
+}
+
+
+module.exports = { pruebaUser,register,login }
