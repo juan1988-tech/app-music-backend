@@ -4,8 +4,8 @@ const validate = (params) =>{
     let resultado = false;
 
     let name = !validator.isEmpty(params.name) &&
-                validator.isLength(params.name,{min: 3, max: undefined}) &&
-                validator.isAlpha(params.name, "es-ES");
+                validator.isLength(params.name,{min: 3, max: undefined})
+                validator.isAlpha(params.name, "es-ES");                
 
     let nickname = !validator.isEmpty(params.nickname) &&
                     validator.isLength(params.nickname,{min: 2, max: 60}) 
@@ -32,6 +32,7 @@ const validate = (params) =>{
     if(!name || !nickname || !email || !password){
         throw new Error('no se ha superado la validación: Datos obligatorios incorrectos')
     }else{
+        console.log(name,nickname,email,password)
         console.log('validación superada');
         resultado = true;
     }

@@ -16,24 +16,25 @@ const register = (req,res) =>{
     //recoger los datos de la petición
     let params = req.body;
 
-
     //comprobar que los datos llegan bien
     if(!params.name || !params.nickname || !params.email || !params.password){
         return res.status(400).json({
             status:"failed",
-            message: "Faltan datos por enviar"
+            message: "Faltan datos por enviar",
         })
     }
 
     //Validación de datos
     try{
-        validate(params)
+        validate(params)    
     }catch(error){
-        return res.status(400).send({
+        return res.status(400).json({
             status:"failed",
-            message: "Validación no superada"
+            message: "Validación no superada",
+            error
         })
-    } 
+    }
+
     //Control de usuarios duplicados
     User.find({
         $or:[
@@ -45,9 +46,10 @@ const register = (req,res) =>{
     if(!user){
         return res.status(500).send({
             status:"failed",
-            message: "Error en la consulta de usuarios  duplicados"
+            message: "Error en la consulta de usuarios duplicados"
         })
     }
+    
 
     if(user && user.length >=1){
         return res.status(200).send({
@@ -71,10 +73,9 @@ const register = (req,res) =>{
         })
     }
 
-    console.log(userSaved)
-
     //Guarda el usuario en la base de datos
-    userSaved.save().then((userStored)=>{
+    userSaved.save()
+    .then((userStored)=>{
         //limpiar el password y el rol del objeto de retorno
         let userCreated = userStored.toObject();
         delete userCreated.password;
@@ -89,11 +90,51 @@ const register = (req,res) =>{
    })
 }
 
-const login = (req,res) =>{
+const login = async (req,res) =>{
+    //recoger los parametros de la petición
+    let params = req.body;
+  
+    if(!params.email || !params.password){
+        return res.status(404).send({
+            status: "failed",
+            message: "Falta ingresar el correo o la contraseña"
+        })
+    }
 
-    return res.status(200).json({
-        status:"success",
-        message:"Usuario ingresa correctamente",
+    //Buscar en la base de datos si existe el usuario
+
+
+    await User.findOne({ email: params.email })
+    .select("+password")
+    .then((user)=>{
+        if(!user){
+           return res.status(404).send({
+            status: "Error",
+            message: "Usuario no existe"
+           }) 
+        }
+
+
+
+        //Comparar la contraseña
+        const pwd = bcrypt.compareSync(params.password, user.password)
+
+        if(!pwd){
+            return res.status(404).send({
+                status: "Error",
+                message: "La contraseña no es correcta"
+               }) 
+        }
+
+        //Borrar la contraseña despues de la verificacion de la contraseña
+        let identityUser = user.toObject();
+        delete identityUser.password;
+
+        return res.status(200).json({
+            status:"success",
+            message:"Usuario ingresa correctamente",
+            user: identityUser
+        })
     })
 }
 
