@@ -142,5 +142,25 @@ const login = async (req,res) =>{
     })
 }
 
+const profile = async (req,res) =>{
+    //Recoger id del usuario
+    const id = req.params.id;
+    //consulta para sacar los datos del perfil
+    await User.findById(id).then((user)=>{
+        if(!user){
+            return res.status(404).json({
+                status: "Failed",    
+                message: "no existe el usuario"
+            })
+        }
 
-module.exports = { pruebaUser,register,login }
+        return res.status(200).send({
+            status: "Success",
+            message: "Perfil de usuario",
+            id,
+            user
+        })
+    })
+}  
+
+module.exports = { pruebaUser,register,login,profile }
