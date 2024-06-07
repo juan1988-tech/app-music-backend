@@ -1,6 +1,7 @@
 const User = require('../models/user')
 const validate  = require('../helpers/validate')
 const bcrypt = require('bcrypt')
+const jwt = require('../helpers/jwt');
 
 //acción de prueba
 const pruebaUser = (req,res) =>{
@@ -105,7 +106,7 @@ const login = async (req,res) =>{
 
 
     await User.findOne({ email: params.email })
-    .select("+password")
+    .select("+password +role")
     .then((user)=>{
         if(!user){
            return res.status(404).send({
@@ -113,8 +114,6 @@ const login = async (req,res) =>{
             message: "Usuario no existe"
            }) 
         }
-
-
 
         //Comparar la contraseña
         const pwd = bcrypt.compareSync(params.password, user.password)
@@ -129,11 +128,16 @@ const login = async (req,res) =>{
         //Borrar la contraseña despues de la verificacion de la contraseña
         let identityUser = user.toObject();
         delete identityUser.password;
+        delete identityUser.role;
+
+        //Conseguir el token jwt
+        const token = jwt.createToken(user)
 
         return res.status(200).json({
             status:"success",
             message:"Usuario ingresa correctamente",
-            user: identityUser
+            user: identityUser,
+            token
         })
     })
 }
