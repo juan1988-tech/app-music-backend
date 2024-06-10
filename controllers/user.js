@@ -8,7 +8,8 @@ const pruebaUser = (req,res) =>{
 
     return res.status(200).send({
         status: "success",
-        message:"Mensaje enviado desde el archivo user.js"
+        message:"Mensaje enviado desde el archivo user.js",
+        user: req.user
     })
 }
 
@@ -61,8 +62,8 @@ const register = (req,res) =>{
     }
 
     //cifrar la contraseña
-    let pwd = await bcrypt.hash(params.password,10);
-    params.password = pwd;
+    //let pwd = await bcrypt.hash(params.password,10);
+    //params.password = pwd;
 
     //crea el objeto de usuario
     let userSaved = new User(params);
@@ -94,7 +95,8 @@ const register = (req,res) =>{
 const login = async (req,res) =>{
     //recoger los parametros de la petición
     let params = req.body;
-  
+    console.log(params);
+
     if(!params.email || !params.password){
         return res.status(404).send({
             status: "failed",
@@ -116,15 +118,16 @@ const login = async (req,res) =>{
         }
 
         //Comparar la contraseña
-        const pwd = bcrypt.compareSync(params.password, user.password)
-
-        if(!pwd){
+        const pwd =  (params.password === user.password)?true:false; 
+        //bcrypt.compareSync(params.password, user.password)
+        console.log(pwd)
+         if(!pwd){
             return res.status(404).send({
                 status: "Error",
                 message: "La contraseña no es correcta"
                }) 
         }
-
+ 
         //Borrar la contraseña despues de la verificacion de la contraseña
         let identityUser = user.toObject();
         delete identityUser.password;

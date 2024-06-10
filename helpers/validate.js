@@ -32,7 +32,6 @@ const validate = (params) =>{
     if(!name || !nickname || !email || !password){
         throw new Error('no se ha superado la validación: Datos obligatorios incorrectos')
     }else{
-        console.log(name,nickname,email,password)
         console.log('validación superada');
         resultado = true;
     }

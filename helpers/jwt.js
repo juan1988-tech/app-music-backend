@@ -2,10 +2,8 @@
 const jwt = require('jwt-simple');
 const moment = require('moment')
 
-
 //clave secreta
 const secret = "CLAVE_SECRETA_API_MUSIC_BACKEND-1231230980";
-
 
 const createToken = (user) =>{
     const payload = {
