@@ -52,7 +52,6 @@ const register = (req,res) =>{
         })
     }
     
-
     if(user && user.length >=1){
         return res.status(200).send({
             status: "error",
@@ -166,12 +165,86 @@ const profile = async (req,res) =>{
 }  
 
 //actualizar el usuario 
-const update = (req,res) =>{
+const update = async (req,res) =>{
+    //recoger los datos del usuario identificado
+    let userIdentity = req.user;
 
-    return res.status(200).json({
-        status:"Success",
-        message:"Metodo de actualuzación del usuario"
-    })
+    //recoger los datos a actualizar
+    let userToUpdate = req.body;
+    //validar datos
+    try{
+        validate(userToUpdate)
+    }
+    catch(error){
+        return res.status(400).json({
+            status: "error",
+            message: "Validación no superada"
+        })
+    }
+
+    //Comprobar si el usuario existe
+    await User.find({
+        $or:[
+            { email: userToUpdate.email.toLowerCase() },
+            { nickname: userToUpdate.nickname.toLowerCase() }
+        ]
+    }).exec().then(async (users)=>{
+        //Error en la consulta de usuarios
+        if(!users){
+            return res.status(500).send({
+                status: "Error",
+                message: "Error en la consulta",
+            })
+        }
+
+        //comprobar si el usuario existe
+        let userIsset = false;
+
+        users.forEach((user)=>{
+ 
+            let userString = user._id.toString();
+           
+            if(user && userString != userIdentity.id){
+                userIsset = true;
+            }
+        })
+        
+        if(userIsset){
+            return res.status(200).json({
+                status:"success",
+                message:"el usuario ya existe"
+            })
+        }
+
+        try{
+        //Buscar el usuario y actualizar la base de datos
+        await User.findByIdAndUpdate({_id: userIdentity.id}, userToUpdate,{new: true})
+        .exec()
+        .then((updated)=>{
+            if(!updated){
+                return res.status(400).json({
+                    status:"Failed",
+                    message:"Error al actualizar: no existe el usuario"
+                   })     
+            }
+
+            //Devolver la respuesta
+            return res.status(200).json({
+                status:"Success",
+                message:"Usuario actualizado",
+                user: updated    
+            })
+        });
+            
+        }catch(error){
+           return res.status(500).json({
+            status:"Failed",
+            message:"Error al actualizar",
+            error
+           })
+        }
+     })
+
 }
 
 module.exports = { pruebaUser,register,login,profile,update }
