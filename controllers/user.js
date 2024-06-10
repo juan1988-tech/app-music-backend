@@ -106,7 +106,6 @@ const login = async (req,res) =>{
 
     //Buscar en la base de datos si existe el usuario
 
-
     await User.findOne({ email: params.email })
     .select("+password +role")
     .then((user)=>{
@@ -166,4 +165,13 @@ const profile = async (req,res) =>{
     })
 }  
 
-module.exports = { pruebaUser,register,login,profile }
+//actualizar el usuario 
+const update = (req,res) =>{
+
+    return res.status(200).json({
+        status:"Success",
+        message:"Metodo de actualuzación del usuario"
+    })
+}
+
+module.exports = { pruebaUser,register,login,profile,update }

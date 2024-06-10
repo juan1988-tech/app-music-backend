@@ -13,7 +13,8 @@ const userController = require('../controllers/user');
 router.get('/prueba',check.auth,userController.pruebaUser);
 router.post('/register',userController.register);
 router.post('/login',userController.login);
-router.get('/profile/:id',check.auth,userController.profile)
+router.get('/profile/:id',check.auth,userController.profile);
+router.put('/update',check.auth,userController.update)
 //exportar la ruta
 module.exports = router;
 
