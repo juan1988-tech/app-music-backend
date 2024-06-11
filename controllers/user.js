@@ -5,7 +5,8 @@ const jwt = require('../helpers/jwt');
 
 //acción de prueba
 const pruebaUser = (req,res) =>{
-
+    const userItem = req.user;
+    console.log(userItem)
     return res.status(200).send({
         status: "success",
         message:"Mensaje enviado desde el archivo user.js",
@@ -60,10 +61,6 @@ const register = (req,res) =>{
         })
     }
 
-    //cifrar la contraseña
-    //let pwd = await bcrypt.hash(params.password,10);
-    //params.password = pwd;
-
     //crea el objeto de usuario
     let userSaved = new User(params);
 
@@ -94,7 +91,6 @@ const register = (req,res) =>{
 const login = async (req,res) =>{
     //recoger los parametros de la petición
     let params = req.body;
-    console.log(params);
 
     if(!params.email || !params.password){
         return res.status(404).send({
@@ -108,6 +104,7 @@ const login = async (req,res) =>{
     await User.findOne({ email: params.email })
     .select("+password +role")
     .then((user)=>{
+        console.log(user);
         if(!user){
            return res.status(404).send({
             status: "Error",
@@ -116,9 +113,9 @@ const login = async (req,res) =>{
         }
 
         //Comparar la contraseña
-        const pwd =  (params.password === user.password)?true:false; 
+        const pwd =  (params.password === user.password)? true: false; 
         //bcrypt.compareSync(params.password, user.password)
-        console.log(pwd)
+        
          if(!pwd){
             return res.status(404).send({
                 status: "Error",
@@ -128,6 +125,7 @@ const login = async (req,res) =>{
  
         //Borrar la contraseña despues de la verificacion de la contraseña
         let identityUser = user.toObject();
+
         delete identityUser.password;
         delete identityUser.role;
 
@@ -244,7 +242,26 @@ const update = async (req,res) =>{
            })
         }
      })
-
 }
 
-module.exports = { pruebaUser,register,login,profile,update }
+const upload = (req,res) =>{
+    //configuración de subida por multer
+    
+    //recoger fichero de imagen
+
+    //Conseguir el nombre del archivo
+
+    //Sacar info de la imagen
+
+    //comprobar si la extensión es valida
+
+    //Guardar la imagen en la base de datos
+
+    //retornar una respuesta
+    return res.status(200).send({
+        status:"success",
+        message:"método de subir imagenes"
+    })
+}
+
+module.exports = { pruebaUser,register,login,profile,update,upload }
