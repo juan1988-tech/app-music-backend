@@ -260,7 +260,8 @@ const upload = (req,res) =>{
     //retornar una respuesta
     return res.status(200).send({
         status:"success",
-        message:"método de subir imagenes"
+        message:"método de subir imagenes",
+        file: req.file
     })
 }
 
