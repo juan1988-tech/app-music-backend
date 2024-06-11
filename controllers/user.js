@@ -244,25 +244,49 @@ const update = async (req,res) =>{
      })
 }
 
-const upload = (req,res) =>{
-    //configuración de subida por multer
-    
-    //recoger fichero de imagen
+const upload = async (req,res) =>{
+
+    //Comprobar si el archivo existe preliminarmente 
+    if(!req.file){
+        res.status(404).send({
+            status:"failed",
+            message:"La petición no incluye la imagen"
+        })
+    }
 
     //Conseguir el nombre del archivo
-
-    //Sacar info de la imagen
+    let image = req.file.originalname;
 
     //comprobar si la extensión es valida
+    const imageSplit = image.split('\.');
+    const imageExtention = imageSplit[1];
 
-    //Guardar la imagen en la base de datos
+    if(imageExtention!="PNG" && imageExtention!="png" && imageExtention!="jpg" && imageExtention!="jpeg"){
+        return res.status(404).json({
+            status:"failed",
+            message:"el archivo no contiene la extención de imagen adecuada"
+        })
+    }
 
-    //retornar una respuesta
-    return res.status(200).send({
+    //guardar el archivo en la base de datros
+    await User.findOneAndUpdate({ _id: req.user.id},{ image: req.file.filename },{ new: true })
+    .exec()
+    .then(function(userUpdated){
+        if(!userUpdated){
+            return res.status(400).json({
+                status:"failed",
+                message:"Error en la subida de archivos "
+            })
+        }
+          //retornar una respuesta
+        return res.status(200).send({
         status:"success",
         message:"método de subir imagenes",
+        user: userUpdated,
         file: req.file
+        })
     })
+    //Guardar la imagen en la base de datos 
 }
 
 module.exports = { pruebaUser,register,login,profile,update,upload }
