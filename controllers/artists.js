@@ -1,3 +1,5 @@
+const Artist = require('../models/artist');
+
 const pruebaArtist = (req,res) =>{
 
     return res.status(200).send({
