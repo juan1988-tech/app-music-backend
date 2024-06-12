@@ -2,6 +2,8 @@ const User = require('../models/user')
 const validate  = require('../helpers/validate')
 const bcrypt = require('bcrypt')
 const jwt = require('../helpers/jwt');
+const fs = require('node:fs');
+const path = require('node:path');
 
 //acción de prueba
 const pruebaUser = (req,res) =>{
@@ -268,7 +270,7 @@ const upload = async (req,res) =>{
         })
     }
 
-    //guardar el archivo en la base de datros
+    //guardar el archivo en la base de datos
     await User.findOneAndUpdate({ _id: req.user.id},{ image: req.file.filename },{ new: true })
     .exec()
     .then(function(userUpdated){
@@ -289,4 +291,25 @@ const upload = async (req,res) =>{
     //Guardar la imagen en la base de datos 
 }
 
-module.exports = { pruebaUser,register,login,profile,update,upload }
+const avatar = (req,res) =>{
+    //sacar el parametro de la url
+    const file = req.params.file;
+
+    //mostar el path real de la imagen
+    const filePath = "./uploads/avatars/"+file;
+
+    //comprobar que el archivo existe
+    fs.stat(filePath,(error,exists)=>{
+        if(!exists){
+            return res.status(400).send({
+                status: "failed",
+                message: "no existe la imagen"
+            })
+        }
+
+        return res.sendFile(path.resolve(filePath));
+    })
+
+}
+
+module.exports = { pruebaUser,register,login,profile,update,upload,avatar }
