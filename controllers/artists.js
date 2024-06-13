@@ -33,4 +33,25 @@ const save = (req,res) =>{
     })
 }
 
-module.exports = { pruebaArtist, save }
+const oneArtist = async (req,res) =>{
+    //sacar el parametro por la url
+    const artistId = req.params.id
+
+    await Artist.findById(artistId)
+    .then((artist)=>{
+        if(!artist){
+            return res.status(404).json({
+                status: "Failed",    
+                message: "no existe el artista"
+            })
+        }
+
+        return res.status(200).json({
+            status:"success",
+            message:"Ver un solo artista",
+            artist
+        })
+    })
+}
+
+module.exports = { pruebaArtist, save, oneArtist}
