@@ -2,8 +2,6 @@
 const express = require('express');
 const check = require('../middlewares/auth')
 
-
-
 //Cargar router
 const router = express.Router();
 
