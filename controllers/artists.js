@@ -110,10 +110,39 @@ const update = (req,res) =>{
 
         return res.status(200).json({
             status:"success",
-            message:"Actualaización de artista",
+            message:"Actualización de artista",
             artist: artistUpdated
         })
     })
 }
 
-module.exports = { pruebaArtist, save, oneArtist, list, update }
+const deleteArtist = async (req,res) =>{
+
+    //Sacar el id del artista a eliminar
+    const artistId = req.params.id;
+
+    try{
+        //Hacer una consulta para remover o eliminar un artista
+        const artistRemoved = await Artist.findByIdAndDelete(artistId);
+        if(!artistRemoved){
+            return res.status(500).json({
+                status:"success",
+                message:"El artista no existe",
+            })
+        }
+
+        return res.status(200).json({
+            status:"success",
+            message:"Artista eliminado",
+            artist: artistRemoved
+        })
+    }catch(error){
+        return res.status(500).json({
+            status:"success",
+            message:"Error al eliminar el artista",
+        })
+    }
+      
+}
+
+module.exports = { pruebaArtist, save, oneArtist, list, update, deleteArtist }

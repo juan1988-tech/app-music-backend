@@ -14,6 +14,6 @@ router.post('/save',check.auth,artistController.save)
 router.get('/ver-artista/:id',check.auth,artistController.oneArtist)
 router.get('/ver-lista-de-artistas/:page?',check.auth,artistController.list)
 router.put('/actualizar-artista/:id',check.auth,artistController.update)
-
+router.delete('/eliminar-artista/:id',check.auth,artistController.deleteArtist)
 //exportar la ruta
 module.exports = router;
