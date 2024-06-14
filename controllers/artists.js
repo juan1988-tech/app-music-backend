@@ -1,3 +1,4 @@
+const artist = require('../models/artist');
 const Artist = require('../models/artist');
 const mongoosePagination = require('mongoose-pagination');
 
@@ -89,4 +90,30 @@ const list = (req,res) =>{
     })
 }
 
-module.exports = { pruebaArtist, save, oneArtist, list }
+const update = (req,res) =>{
+    //recoger el id del artista
+    const id = req.params.id;
+
+    //llamar al artista de la base de datos
+    const data = req.body;
+
+    //Buscar y actualizar al artista
+    Artist.findByIdAndUpdate(id,data,{new: true})
+    .exec()
+    .then((artistUpdated)=>{
+        if(!artistUpdated){
+            return res.status(500).json({
+                status:"failed",
+                message:"Error al actualizar: no se encuentra el artista",
+            })
+        }
+
+        return res.status(200).json({
+            status:"success",
+            message:"Actualaización de artista",
+            artist: artistUpdated
+        })
+    })
+}
+
+module.exports = { pruebaArtist, save, oneArtist, list, update }

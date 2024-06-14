@@ -13,6 +13,7 @@ router.get('/prueba',artistController.pruebaArtist)
 router.post('/save',check.auth,artistController.save)
 router.get('/ver-artista/:id',check.auth,artistController.oneArtist)
 router.get('/ver-lista-de-artistas/:page?',check.auth,artistController.list)
+router.put('/actualizar-artista/:id',check.auth,artistController.update)
 
 //exportar la ruta
 module.exports = router;
