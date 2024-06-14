@@ -1,4 +1,6 @@
 const Artist = require('../models/artist');
+const mongoosePagination = require('mongoose-pagination');
+
 
 const pruebaArtist = (req,res) =>{
 
@@ -56,6 +58,7 @@ const oneArtist = async (req,res) =>{
 
 const list = (req,res) =>{
     //sacar la posible página
+    console.log(mongoosePagination)
     let page = 1;
 
     if(req.params.page){
@@ -66,7 +69,7 @@ const list = (req,res) =>{
     const itemsPage = 5;
 
     //retorna a varios artistas
-    Artist.find().exec().then((artistas)=>{
+    Artist.find().paginate(page,itemsPage).exec().then((artistas)=>{
 
         //array para organizar a la lista de artistas por orden alfabetico
         let artistasOrdenados =  artistas.sort((a,b)=>{
@@ -81,11 +84,9 @@ const list = (req,res) =>{
         return res.status(200).json({
             status:"success",
             message:"Listado de artistas",
-            page,
             artists: artistasOrdenados
         })
     })
-    
 }
 
 module.exports = { pruebaArtist, save, oneArtist, list }
