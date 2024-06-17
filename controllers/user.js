@@ -247,7 +247,6 @@ const update = async (req,res) =>{
 }
 
 const upload = async (req,res) =>{
-
     //Comprobar si el archivo existe preliminarmente 
     if(!req.file){
         res.status(404).send({
@@ -271,7 +270,7 @@ const upload = async (req,res) =>{
     }
 
     //guardar el archivo en la base de datos
-    await User.findOneAndUpdate({ _id: req.user.id},{ image: req.file.filename },{ new: true })
+    await User.findOneAndUpdate({ _id: req.user.id },{ image: req.file.filename },{ new: true })
     .exec()
     .then(function(userUpdated){
         if(!userUpdated){
@@ -296,7 +295,7 @@ const avatar = (req,res) =>{
     const file = req.params.file;
 
     //mostar el path real de la imagen
-    const filePath = "./uploads/avatars/"+file;
+    const filePath = "./uploads/artist/"+file;
 
     //comprobar que el archivo existe
     fs.stat(filePath,(error,exists)=>{
@@ -309,7 +308,6 @@ const avatar = (req,res) =>{
 
         return res.sendFile(path.resolve(filePath));
     })
-
 }
 
 module.exports = { pruebaUser,register,login,profile,update,upload,avatar }

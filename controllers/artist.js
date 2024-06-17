@@ -1,6 +1,7 @@
-const artist = require('../models/artist');
 const Artist = require('../models/artist');
 const mongoosePagination = require('mongoose-pagination');
+const fs = require('node:fs');
+const path = require('node:path');
 
 
 const pruebaArtist = (req,res) =>{
@@ -142,7 +143,71 @@ const deleteArtist = async (req,res) =>{
             message:"Error al eliminar el artista",
         })
     }
-      
 }
 
-module.exports = { pruebaArtist, save, oneArtist, list, update, deleteArtist }
+const upload = async (req,res) =>{
+     //Comprobar si el archivo existe preliminarmente 
+     if(!req.file){
+        res.status(404).send({
+            status:"failed",
+            message:"La petición no incluye la imagen"
+        })
+    }
+    //Conseguir el nombre del archivo
+    let image = req.file.originalname;
+    console.log(image);
+
+
+    //comprobar si la extensión es valida
+    const imageSplit = image.split('\.');
+    const imageExtention = imageSplit[1];
+    
+    if(imageExtention!="PNG" && imageExtention!="png" && imageExtention!="jpg" && imageExtention!="jpeg"){
+        return res.status(404).json({
+            status:"failed",
+            message:"el archivo no contiene la extención de imagen adecuada"
+        })
+    }
+
+    const articleId = req.params.id;
+    await Artist.findOneAndUpdate({ _id: articleId },{ image: req.file.filename },{ new: true })
+    .exec()
+    .then(function(artistUpdated){
+        console.log(artistUpdated);
+        if(!artistUpdated){
+            return res.status(400).json({
+                status:"failed",
+                message:"Error en la subida de archivos "
+            })
+        }
+          //retornar una respuesta
+        return res.status(200).send({
+        status:"success",
+        message:"método de subir imagenes",
+        artist: artistUpdated,
+        file: req.file
+        })
+    })
+}
+
+const image = (req,res) =>{
+    //sacar el parametro de la url
+    const file = req.params.file;
+
+    //mostar el path real de la imagen
+    const filePath = "./uploads/artists/"+file;
+
+    //comprobar que el archivo existe
+    fs.stat(filePath,(error,exists)=>{
+        if(!exists){
+            return res.status(400).send({
+                status: "failed",
+                message: "no existe la imagen"
+            })
+        }
+
+        return res.sendFile(path.resolve(filePath));
+    })
+}
+
+module.exports = { pruebaArtist, save, oneArtist, list, update, deleteArtist, upload, image }
