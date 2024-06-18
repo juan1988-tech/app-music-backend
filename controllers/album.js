@@ -34,4 +34,26 @@ const save = (req,res) =>{
     })
 }
 
-module.exports = { pruebaAlbum, save }
+const showAlbum = async (req,res) =>{
+    //captar los objetos en la base de datos
+    const id = req.params.id;
+    
+    await Album.findById(id)
+    .populate({ path: "artist"})
+    .then((album)=>{
+        if(!album){
+            res.status(400).send({
+                status:"failed",
+                message:"El album no existe"
+            })
+        }
+
+        return res.status(200).json({
+            status: "success",
+            message:"Ver Album",
+            album
+        })
+    })
+}
+
+module.exports = { pruebaAlbum, save, showAlbum }

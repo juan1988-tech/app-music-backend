@@ -11,6 +11,7 @@ const albumController =  require('../controllers/album')
 //Definir la primer ruta
 router.get('/prueba',check.auth,albumController.pruebaAlbum)
 router.post('/guardar-album/:id',albumController.save)
+router.get('/ver-album/:id',check.auth,albumController.showAlbum)
 
 //exportar la ruta
 module.exports = router;
