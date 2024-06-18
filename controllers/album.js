@@ -56,4 +56,29 @@ const showAlbum = async (req,res) =>{
     })
 }
 
-module.exports = { pruebaAlbum, save, showAlbum }
+const list = async (req,res) =>{
+    //sacar la id del artista
+    const id = req.params.idArtist;
+
+    if(!id){
+        return res.status(400).json({
+            status: "failed",
+            message: "no se encuentra el artista"
+        })
+    }
+    //sacar todos los albumes de un solo artista
+    await Album.find({artist: id}).populate({ path: "artist"}).then((albums)=>{
+        if(albums.length ===0){
+            return res.status(400).json({
+                status: "failed",
+                albumes: "El artista no tiene albumes asociados"
+            })    
+        }
+        return res.status(200).json({
+            status: "success",
+            albumes: albums
+        })
+    })
+}
+
+module.exports = { pruebaAlbum, save, showAlbum, list }
