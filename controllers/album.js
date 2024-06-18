@@ -81,4 +81,31 @@ const list = async (req,res) =>{
     })
 }
 
-module.exports = { pruebaAlbum, save, showAlbum, list }
+const update = async (req,res) =>{
+    //recoge el id del album
+    const id = req.params.idAlbum;
+
+    //recoge el album a actualizar
+    const updatedAlbum = req.body
+
+    //hacer la actualización del album
+    await Album.findByIdAndUpdate(id,updatedAlbum,{ new: true })
+    .populate({ path: "artist"})
+    .exec()
+    .then((albumItem)=>{
+        if(!albumItem){
+            return res.status(401).json({
+                status: "failed",
+                message: "El album no existe"
+            })    
+        }
+
+        return res.status(200).json({
+            status: "success",
+            message: "Album correctamente actualizado",
+            album: albumItem
+        })
+    })
+}
+
+module.exports = { pruebaAlbum, save, showAlbum, list, update }
