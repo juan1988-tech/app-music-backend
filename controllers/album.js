@@ -1,4 +1,6 @@
 const Album = require('../models/album');
+const fs = require('node:fs');
+const path = require('node:path');
 
 const pruebaAlbum = (req,res) =>{
     
@@ -108,4 +110,83 @@ const update = async (req,res) =>{
     })
 }
 
-module.exports = { pruebaAlbum, save, showAlbum, list, update }
+const upload = async (req,res) =>{
+   //Comprobar si el archivo existe preliminarmente 
+    let imageRequest = req.file;
+    if(!imageRequest){
+        return res.status(400).send({
+            status:"failed",
+            message:"No se encuentra el archivo de imagen",
+            })    
+    }
+    
+    //Conseguir el nombre del archivo
+    let image = req.file.originalname;
+
+    //comprobar si la extensión es valida
+    const imageSplit = image.split('\.');
+    const imageExtention = imageSplit[1];
+    
+    if(imageExtention!="PNG" && imageExtention!="png" && imageExtention!="jpg" && imageExtention!="jpeg"){
+        return res.status(400).json({
+            status:"failed",
+            message:"el archivo no contiene la extención de imagen adecuada"
+        })
+    }
+
+    //guardar el archivo en la base de datos
+    try{
+        const albumId = req.params.id;
+        console.log(albumId);
+        await Album.findOneAndUpdate({ _id: albumId },{ image: req.file.filename },{ new: true })    
+        .exec()
+        .then((albumUpdated)=>{
+            console.log(albumUpdated);
+            if(!albumUpdated){
+                res.status(400).json({
+                status: "failed",
+                message: "Error en la subida de los archivos",
+                error
+                })
+            }    
+           
+            return res.status(200).send({
+                status:"success",
+                message:"método de subir imagenes",
+                album: albumUpdated,
+                file: req.file
+            })
+        })        
+    }catch(error){
+        if(error){
+            res.status(400).json({
+            status: "failed",
+            message: "Error en la subida de los archivos",
+            })
+        }    
+    } 
+}
+
+const image = (req,res) =>{
+    //sacar el parametro de la url
+    const file = req.params.file;
+    console.log(file);
+
+    //mostar el path real de la imagen
+    const filePath = "./uploads/albums/"+file;
+    console.log(filePath);
+
+    fs.stat(filePath,(error,exists)=>{
+       if(!exists){
+        return res.status(400).send({
+            status: "failed",
+            message: "no existe la imagen"
+        })
+       }
+       
+       return res.sendFile(path.resolve(filePath));
+    })
+}
+
+
+module.exports = { pruebaAlbum, save, showAlbum, list, update, upload, image }

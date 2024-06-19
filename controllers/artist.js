@@ -164,8 +164,6 @@ const upload = async (req,res) =>{
     }
     //Conseguir el nombre del archivo
     let image = req.file.originalname;
-    console.log(image);
-
 
     //comprobar si la extensión es valida
     const imageSplit = image.split('\.');
@@ -202,9 +200,11 @@ const upload = async (req,res) =>{
 const image = (req,res) =>{
     //sacar el parametro de la url
     const file = req.params.file;
+    console.log(file)
 
     //mostar el path real de la imagen
-    const filePath = "./uploads/artists/"+file;
+    const filePath = "./uploads/artist/"+file;
+    console.log(filePath);
 
     //comprobar que el archivo existe
     fs.stat(filePath,(error,exists)=>{
