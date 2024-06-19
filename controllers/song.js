@@ -94,4 +94,43 @@ const list = (req,res) =>{
        })
 }   
 
-module.exports = { pruebaSong, save, one, list }
+const update = async (req,res) =>{
+    //obtener la identidad de la cancion en la url
+    let id = req.params.idsong;
+
+    //Obtener los datos del formulario
+    const updatedSong = req.body
+
+    if(!updatedSong.track || !updatedSong.name || !updatedSong.duration){
+        return res.status(404).send({
+            status: "failed",
+            message: "Debes ingresar todo los datos requeridos"
+        })
+    }
+
+    try{
+    Song.findByIdAndUpdate(id,updatedSong,{ new: true})
+                .populate({ path: "album",
+                    populate:{
+                        path: "artist"
+                    }
+                })
+                .then((songUpdated)=>{
+                    if(!songUpdated){
+                        return res.status(400).json({
+                            status:"failed",
+                            message:" no existe la canción asociada"
+                        })
+                    }
+                    return res.status(200).json({
+                        status:"success",
+                        message:"cancion actualizada exitosamente",
+                        songUpdated
+                    })
+                })
+    }catch(err){
+        console.log(err);
+    }    
+}
+
+module.exports = { pruebaSong, save, one, list, update }
