@@ -57,4 +57,41 @@ const one = async(req,res) =>{
     })
 }
 
-module.exports = { pruebaSong, save, one }
+const list = (req,res) =>{
+       //recoger la id del album 
+       let id = req.params.albumId; 
+
+       //hacer la consulta en la base de datos
+       Song
+       .find({album: id})
+       .populate({ path: "album",
+            populate: {
+                path: "artist"
+            }
+       })
+       .then((listSong)=>{
+        if(!listSong){
+            return res.status(404).json({
+                status: "failed",
+                message: "La lista no existe"
+                })
+            }
+
+            //array para organizar a la lista de artistas por orden alfabetico
+            let listSongOrganized = listSong.sort((a,b)=>{
+            let x = a.track;
+            let y = b.track;
+            if( x < y ){ return -1};
+            if( x > y ){ return 1 };
+            return 0 
+            });
+            
+            return res.status(200).json({
+                status:"success",
+                message:"lista cargada",
+                listSongOrganized
+            })
+       })
+}   
+
+module.exports = { pruebaSong, save, one, list }

@@ -12,6 +12,7 @@ const songController = require('../controllers/song');
 router.get('/prueba',songController.pruebaSong);
 router.post('/subir-cancion',songController.save);
 router.get('/ver-cancion/:idsong',check.auth,songController.one);
+router.get('/list/:albumId',check.auth,songController.list);
 
 //exportar la ruta
 module.exports = router;
