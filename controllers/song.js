@@ -133,4 +133,25 @@ const update = async (req,res) =>{
     }    
 }
 
-module.exports = { pruebaSong, save, one, list, update }
+const deleteSong = async (req,res)  =>{
+    //recoge la identidad de la canción
+    let id = req.params.idsong;
+
+    //aplicar el método borrar a partir de la identidad de la cancion
+    await Song.findOneAndDelete({_id: id})
+    .then((erasedSong)=>{
+        if(!erasedSong){
+            return res.status(400).send({
+                status:"failed",
+                message:"la cancion no existe"
+            })  
+        }
+
+        return res.status(200).send({
+            status:"succes",
+            message:"cancion exitosamente borrada",
+            erasedSong
+        })
+    })
+}
+module.exports = { pruebaSong, save, one, list, update, deleteSong }

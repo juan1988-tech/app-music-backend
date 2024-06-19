@@ -14,6 +14,6 @@ router.post('/subir-cancion',songController.save);
 router.get('/ver-cancion/:idsong',check.auth,songController.one);
 router.get('/list/:albumId',check.auth,songController.list);
 router.put('/actualizar-cancion/:idsong',check.auth,songController.update)
-
+router.delete('/borrar-cancion/:idsong',check.auth,songController.deleteSong)
 //exportar la ruta
 module.exports = router;
