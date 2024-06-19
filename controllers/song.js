@@ -34,6 +34,27 @@ const save = async (req,res) =>{
     }   
 }
 
+const one = async(req,res) =>{
+    //saca la identidad de la canción
+    let songId = req.params.idsong;
+    console.log(songId);
+    //busca a la canción por su identidad, populando el album
+    await Song.findById(songId)
+    .populate({path: "album"})
+    .then((oneSong)=>{
+        if(!oneSong){
+            res.status(400).json({
+                status: "failed",
+                message: "No se ha podido cargar el album"
+            })
+        }
+        else{
+            res.status(200).json({
+                status: "success",
+                oneSong
+            })
+        }
+    })
+}
 
-
-module.exports = { pruebaSong, save }
+module.exports = { pruebaSong, save, one }

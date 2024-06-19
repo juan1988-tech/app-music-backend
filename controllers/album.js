@@ -188,5 +188,4 @@ const image = (req,res) =>{
     })
 }
 
-
 module.exports = { pruebaAlbum, save, showAlbum, list, update, upload, image }
