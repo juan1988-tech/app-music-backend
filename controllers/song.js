@@ -1,5 +1,7 @@
-const Song = require('../models/song')
-const Artist = require('../models/album')
+const Song = require('../models/song');
+const Artist = require('../models/album');
+const fs = require('node:fs');
+const path = require('node:path');
 
 const pruebaSong = (req,res) =>{
 
@@ -155,4 +157,74 @@ const deleteSong = async (req,res)  =>{
     })
 }
 
-module.exports = { pruebaSong, save, one, list, update, deleteSong }
+const uploadSong = async (req,res) =>{
+    //comprobar si el archivo existe preliminarmente
+    let songRequest = req.file;
+    if(!songRequest){
+        return res.status(400).json({
+            status:"error",
+            message: "No hay archivo asociado"
+        })
+    }
+
+    //conseguir el nombre del archivo
+    let song = req.file.originalname;
+    
+    //comprobar si la extención de la imagen es valida
+    const songSplit = song.split('\.');
+    const songExtention = songSplit[1];
+    
+    if(songExtention!="mp3"){
+        fs.unlink(req.file.path,(error)=>{
+            return res.status(404).json({
+                status:"error",
+                message:"el archivo no tiene una extención adecuada",
+            })
+        })
+    }else{
+        //extraer la identidad
+        let songId = req.params.idsong;
+        console.log(songId);
+
+        await Song
+        .findOneAndUpdate({ _id: songId },{ cancion: req.file.filename }, { new: true })
+        .then((upatedSong)=>{
+            if(!upatedSong){
+                return res.status(500).send({
+                    status:"error",
+                    message:"error al actualizar"
+                })
+            }
+
+            return res.status(200).json({
+                status:"success",
+                message:"cancion actualizada",
+                song: upatedSong,
+                file: req.file
+            })
+        }) 
+    }
+}
+
+const audio = (req,res) =>{
+    const file = req.params.file;
+    console.log(file)
+
+    //mostrar el path de la imagen
+    const filePath = "./uploads/song/"+file;
+    console.log(filePath);
+
+    //comprobar si el archivo existe
+    fs.stat(filePath,(error,exists)=>{
+        if(!exists){
+            return res.status(400).send({
+                status: "failed",
+                message: "no existe el audio"
+            })
+        }
+
+        return res.sendFile(path.resolve(filePath));
+    })
+}
+
+module.exports = { pruebaSong, save, one, list, update, deleteSong, uploadSong, audio }
